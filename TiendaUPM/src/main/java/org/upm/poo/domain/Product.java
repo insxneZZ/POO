@@ -2,7 +2,7 @@ package org.upm.poo.domain;
 
 import java.util.Objects;
 
-public final class Product {
+public class Product {
     private final String id;
     private String name;
     private double price;
@@ -14,7 +14,7 @@ public final class Product {
         this.id = id; this.name = name; this.price = price;
     }
 
-    public int getId() { return id; }
+    public String getId() { return id; }
     public String getName() { return name; }
     public double getPrice() { return price; }
 

@@ -13,8 +13,8 @@ public final class Ticket {
         items.add(new LineItem(p, q));
     }
 
-    public void remove(int productId) {
-        items.removeIf(li -> li.getProduct().getId() == productId);
+    public void remove(String productId) {
+        items.removeIf(li -> li.getProduct().getId().equals(productId));
     }
 
     public List<LineItem> getItems() { return Collections.unmodifiableList(items); }
@@ -25,7 +25,7 @@ public final class Ticket {
 
     public double unitDiscountFor(Category c, double unitPrice) {
         int catUnits = items.stream()
-                .filter(li -> li.getProduct().getCategory() == c)
+                .filter(li -> li.getProduct() instanceof ItemProduct ip && ip.getCategory() == c)
                 .mapToInt(LineItem::getQuantity).sum();
         return policy.unitDiscount(c, unitPrice, catUnits);
     }

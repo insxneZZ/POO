@@ -1,11 +1,10 @@
 package org.upm.poo.service;
 
 import org.upm.poo.domain.Product;
-
 import java.util.*;
 
 public final class Catalog {
-    private final Map<Integer, Product> products = new LinkedHashMap<>();
+    private final Map<String, Product> products = new LinkedHashMap<>();
 
     public Product add(Product p) {
         if (products.containsKey(p.getId()))
@@ -16,13 +15,13 @@ public final class Catalog {
 
     public Collection<Product> list() { return products.values(); }
 
-    public Product get(int id) {
+    public Product get(String id) {
         Product p = products.get(id);
         if (p == null) throw new NoSuchElementException("Product not found: " + id);
         return p;
     }
 
-    public Product remove(int id) {
+    public Product remove(String id) {
         Product removed = products.remove(id);
         if (removed == null)
             throw new NoSuchElementException("Product not found: " + id);

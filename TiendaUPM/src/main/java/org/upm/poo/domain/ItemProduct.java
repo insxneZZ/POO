@@ -5,7 +5,7 @@ public abstract class ItemProduct extends Product {
 
     public ItemProduct(String id, String name, double price, Category category) {
         super(id, name, price);
-        setCategory(category)
+        setCategory(category);
     }
 
     public Category getCategory() {

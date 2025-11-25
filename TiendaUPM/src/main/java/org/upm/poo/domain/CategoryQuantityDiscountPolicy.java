@@ -18,13 +18,18 @@ public final class CategoryQuantityDiscountPolicy implements DiscountPolicy {
 
     @Override public double totalDiscount(List<LineItem> items) {
         Map<Category, Integer> units = items.stream()
-                .collect(Collectors.groupingBy(li -> li.getProduct().getCategory(),
-                        Collectors.summingInt(LineItem::getQuantity)));
+                .filter(li -> li.getProduct() instanceof ItemProduct)
+                .collect(Collectors.groupingBy(
+                        li -> ((ItemProduct) li.getProduct()).getCategory(),
+                        Collectors.summingInt(LineItem::getQuantity)
+                ));
 
         double disc = 0.0;
         for (LineItem li : items) {
-            int catUnits = units.getOrDefault(li.getProduct().getCategory(), 0);
-            double u = unitDiscount(li.getProduct().getCategory(), li.getProduct().getPrice(), catUnits);
+            if (!(li.getProduct() instanceof ItemProduct itemProd)) continue;
+
+            int catUnits = units.getOrDefault(itemProd.getCategory(), 0);
+            double u = unitDiscount(itemProd.getCategory(), li.getProduct().getPrice(), catUnits);
             disc += u * li.getQuantity();
         }
         return disc;

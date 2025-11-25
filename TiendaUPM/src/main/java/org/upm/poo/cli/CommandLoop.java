@@ -68,17 +68,17 @@ public final class CommandLoop {
         System.out.println("Discounts if there are ≥2 units in the category: MERCH 0%, STATIONERY 5%, CLOTHES 7%, BOOK 10%, ELECTRONICS 3%.");
     }
 
-
     private void handleProd(List<String> a) {
         if (a.size() < 2) { System.out.println("Usage: prod ..."); return; }
         switch (a.get(1)) {
             case "add" -> {
                 if (a.size() < 6) { System.out.println("Usage: prod add <id> \"<name>\" <category> <price>"); return; }
-                int id = Integer.parseInt(a.get(2));
+                String id = a.get(2);
                 String name = a.get(3);
                 Category cat = Category.valueOf(a.get(4));
                 double price = Double.parseDouble(a.get(5));
-                Product p = catalog.add(new Product(id, name, cat, price));
+
+                Product p = catalog.add(new StandardProduct(id, name, cat, price));
                 System.out.println(p);
                 System.out.println("prod add: ok");
             }
@@ -89,14 +89,22 @@ public final class CommandLoop {
             }
             case "update" -> {
                 if (a.size() < 5) { System.out.println("Usage: prod update <id> NAME|CATEGORY|PRICE <value>"); return; }
-                int id = Integer.parseInt(a.get(2));
+                String id = a.get(2);
                 String field = a.get(3);
                 String value = a.get(4);
                 Product p = catalog.get(id);
+
                 switch (field) {
                     case "NAME"     -> p.setName(value);
-                    case "CATEGORY" -> p.setCategory(Category.valueOf(value));
                     case "PRICE"    -> p.setPrice(Double.parseDouble(value));
+                    case "CATEGORY" -> {
+                        if (p instanceof ItemProduct ip) {
+                            ip.setCategory(Category.valueOf(value));
+                        } else {
+                            System.out.println("Error: Product does not support categories");
+                            return;
+                        }
+                    }
                     default -> throw new IllegalArgumentException("Unknown field: " + field);
                 }
                 System.out.println(p);
@@ -104,7 +112,7 @@ public final class CommandLoop {
             }
             case "remove" -> {
                 if (a.size() < 3) { System.out.println("Usage: prod remove <id>"); return; }
-                int id = Integer.parseInt(a.get(2));
+                String id = a.get(2);
                 Product removed = catalog.remove(id);
                 System.out.println(removed);
                 System.out.println("prod remove: ok");
@@ -122,14 +130,18 @@ public final class CommandLoop {
             }
             case "add" -> {
                 if (a.size() < 4) { System.out.println("Usage: ticket add <prodId> <quantity>"); return; }
-                int prodId = Integer.parseInt(a.get(2));
+                String prodId = a.get(2);
                 int qty = Integer.parseInt(a.get(3));
                 Product p = catalog.get(prodId);
                 tickets.current().add(p, qty);
 
                 Ticket t = tickets.current();
-                // Imprime cada unidad recién añadida, marcando descuento unitario si aplica
-                double unitDisc = t.unitDiscountFor(p.getCategory(), p.getPrice());
+
+                double unitDisc = 0.0;
+                if (p instanceof ItemProduct ip) {
+                    unitDisc = t.unitDiscountFor(ip.getCategory(), p.getPrice());
+                }
+
                 for (int i = 0; i < qty; i++) {
                     if (unitDisc > 0)
                         System.out.println(p + " **discount -" + trim(unitDisc));
@@ -143,14 +155,18 @@ public final class CommandLoop {
             }
             case "remove" -> {
                 if (a.size() < 3) { System.out.println("Usage: ticket remove <prodId>"); return; }
-                int prodId = Integer.parseInt(a.get(2));
+                String prodId = a.get(2);
                 tickets.current().remove(prodId);
                 System.out.println("ticket remove: ok");
             }
             case "print" -> {
                 Ticket t = tickets.current();
                 t.getItems().forEach(li -> {
-                    double unitDisc = t.unitDiscountFor(li.getProduct().getCategory(), li.getProduct().getPrice());
+                    double unitDisc = 0.0;
+                    if (li.getProduct() instanceof ItemProduct ip) {
+                        unitDisc = t.unitDiscountFor(ip.getCategory(), ip.getPrice());
+                    }
+
                     for (int i = 0; i < li.getQuantity(); i++) {
                         if (unitDisc > 0)
                             System.out.println(li.getProduct() + " **discount -" + trim(unitDisc));
@@ -169,7 +185,6 @@ public final class CommandLoop {
 
     private static String trim(double v) {
         String s = String.format(java.util.Locale.ROOT, "%.1f", v);
-        // sin ceros extra tipo 15.0 -> 15.0 (el enunciado usa .0, .1...)
         return s;
     }
 }
