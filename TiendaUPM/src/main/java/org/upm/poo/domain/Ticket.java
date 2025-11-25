@@ -30,14 +30,13 @@ public final class Ticket {
         return datePart + "-" + randomPart;
     }
 
-    // --- Getters ---
     public String getId() { return id; }
     public String getCashierId() { return cashierId; }
     public String getClientId() { return clientId; }
     public TicketState getState() { return state; }
     public List<LineItem> getItems() { return Collections.unmodifiableList(items); }
 
-    public void add(Product p, int q) {
+    public void add(Product p, int q, List<String> customizations) {
         if (state == TicketState.CLOSED) {
             throw new IllegalStateException("Cannot add products to a CLOSED ticket");
         }
@@ -49,16 +48,33 @@ public final class Ticket {
             }
         }
 
+        if (p instanceof CustomizableProduct cp) {
+            if (customizations != null && customizations.size() > cp.getMaxCustomizations()) {
+                throw new IllegalArgumentException("Too many customizations. Max allowed: " + cp.getMaxCustomizations());
+            }
+        } else {
+            if (customizations != null && !customizations.isEmpty()) {
+                throw new IllegalArgumentException("Product " + p.getName() + " does not support customization");
+            }
+        }
+
+        List<String> safeCustoms = (customizations == null) ? List.of() : customizations;
+
         for (LineItem li : items) {
-            if (li.getProduct().equals(p)) {
+            if (li.represents(p, safeCustoms)) {
                 li.add(q);
                 updateState();
                 return;
             }
         }
 
-        items.add(new LineItem(p, q));
+        items.add(new LineItem(p, q, safeCustoms));
         updateState();
+    }
+
+    // Mantenemos el método antiguo redirigiendo al nuevo
+    public void add(Product p, int q) {
+        add(p, q, List.of());
     }
 
     public void remove(String productId) {
