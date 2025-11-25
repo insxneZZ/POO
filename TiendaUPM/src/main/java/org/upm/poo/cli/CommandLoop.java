@@ -174,6 +174,7 @@ public final class CommandLoop {
                 String id = null, cashId, userId;
                 if (a.size() == 5) { id = a.get(2); cashId = a.get(3); userId = a.get(4); }
                 else { cashId = a.get(2); userId = a.get(3); }
+
                 Ticket t = tickets.createTicket(id, cashId, userId);
                 printTicketState(t);
                 System.out.println("ticket new: ok");
@@ -192,8 +193,25 @@ public final class CommandLoop {
 
                 Ticket t = tickets.getTicket(tId);
                 tickets.verifyOwner(t, cashId);
-                t.add(catalog.get(pId), qty, customs);
-                printTicketDetails(t);
+                Product p = catalog.get(pId);
+                t.add(p, qty, customs);
+
+                printTicketHeader(t);
+
+                double base = p.getPrice();
+                double extra = (!customs.isEmpty()) ? base * 0.10 * customs.size() : 0.0;
+                double finalU = base + extra;
+                double uDisc = 0.0;
+                if (p instanceof ItemProduct ip) uDisc = t.unitDiscountFor(ip.getCategory(), finalU);
+
+                for(int i = 0; i < qty; i++) {
+                    String info = p.toString();
+                    if (!customs.isEmpty()) info += " " + customs;
+
+                    if (uDisc > 0) System.out.println("  " + info + " **discount -" + trim(uDisc));
+                    else System.out.println("  " + info);
+                }
+                printTicketTotals(t);
                 System.out.println("ticket add: ok");
             }
             case "remove" -> {
@@ -227,24 +245,33 @@ public final class CommandLoop {
     }
 
     private void printTicketState(Ticket t) {
+        printTicketHeader(t);
+        printTicketTotals(t);
+    }
+
+    private void printTicketHeader(Ticket t) {
         System.out.println("Ticket : " + t.getId());
+    }
+
+    private void printTicketTotals(Ticket t) {
         System.out.println("  Total price: " + trim(t.totalPrice()));
         System.out.println("  Total discount: " + trim(t.totalDiscount()));
         System.out.println("  Final Price: " + trim(t.finalPrice()));
     }
 
     private void printTicketDetails(Ticket t) {
-        System.out.println("Ticket : " + t.getId());
+        printTicketHeader(t);
         t.getItems().stream()
                 .sorted((l1, l2) -> l1.getProduct().getName().compareToIgnoreCase(l2.getProduct().getName()))
                 .forEach(li -> {
                     Product p = li.getProduct();
-                    double uDisc = 0.0;
-                    if (p instanceof ItemProduct ip) uDisc = t.unitDiscountFor(ip.getCategory(), p.getPrice());
 
                     double base = p.getPrice();
                     double extra = (!li.getCustomizations().isEmpty()) ? base * 0.10 * li.getCustomizations().size() : 0.0;
                     double finalU = base + extra;
+
+                    double uDisc = 0.0;
+                    if (p instanceof ItemProduct ip) uDisc = t.unitDiscountFor(ip.getCategory(), finalU);
 
                     for(int i=0; i<li.getQuantity(); i++) {
                         String info = p.toString();
@@ -254,9 +281,7 @@ public final class CommandLoop {
                         else System.out.println("  " + info);
                     }
                 });
-        System.out.println("  Total price: " + trim(t.totalPrice()));
-        System.out.println("  Total discount: " + trim(t.totalDiscount()));
-        System.out.println("  Final Price: " + trim(t.finalPrice()));
+        printTicketTotals(t);
     }
 
     // --- USUARIOS ---

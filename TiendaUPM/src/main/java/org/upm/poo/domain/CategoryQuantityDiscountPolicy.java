@@ -29,7 +29,9 @@ public final class CategoryQuantityDiscountPolicy implements DiscountPolicy {
             if (!(li.getProduct() instanceof ItemProduct itemProd)) continue;
 
             int catUnits = units.getOrDefault(itemProd.getCategory(), 0);
-            double u = unitDiscount(itemProd.getCategory(), li.getProduct().getPrice(), catUnits);
+            double realUnitPrice = li.subtotal() / li.getQuantity();
+
+            double u = unitDiscount(itemProd.getCategory(), realUnitPrice, catUnits);
             disc += u * li.getQuantity();
         }
         return disc;
