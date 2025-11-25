@@ -6,8 +6,10 @@ import org.upm.poo.service.TicketService;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.UUID;
 
 public final class CommandLoop {
     private final Catalog catalog;
@@ -53,6 +55,8 @@ public final class CommandLoop {
     private void printHelp() {
         System.out.println("Commands:");
         System.out.println("  prod add <id> \"<name>\" <category> <price>");
+        System.out.println("  prod addFood [<id>] \"<name>\" <price> <yyyy-MM-dd> <maxPeople>");
+        System.out.println("  prod addMeeting [<id>] \"<name>\" <price> <yyyy-MM-dd> <maxPeople>");
         System.out.println("  prod list");
         System.out.println("  prod update <id> NAME|CATEGORY|PRICE <value>");
         System.out.println("  prod remove <id>");
@@ -68,6 +72,7 @@ public final class CommandLoop {
         System.out.println("Discounts if there are ≥2 units in the category: MERCH 0%, STATIONERY 5%, CLOTHES 7%, BOOK 10%, ELECTRONICS 3%.");
     }
 
+
     private void handleProd(List<String> a) {
         if (a.size() < 2) { System.out.println("Usage: prod ..."); return; }
         switch (a.get(1)) {
@@ -77,10 +82,73 @@ public final class CommandLoop {
                 String name = a.get(3);
                 Category cat = Category.valueOf(a.get(4));
                 double price = Double.parseDouble(a.get(5));
-
                 Product p = catalog.add(new StandardProduct(id, name, cat, price));
                 System.out.println(p);
                 System.out.println("prod add: ok");
+            }
+            case "addFood" -> {
+                if (a.size() < 6) {
+                    System.out.println("Usage: prod addFood [<id>] \"<name>\" <price> <yyyy-MM-dd> <maxPeople>");
+                    return;
+                }
+                String id;
+                String name;
+                double price;
+                LocalDate expiration;
+                int maxPeople;
+
+                if (a.size() == 7) {
+                    id = a.get(2);
+                    name = a.get(3);
+                    price = Double.parseDouble(a.get(4));
+                    expiration = LocalDate.parse(a.get(5));
+                    maxPeople = Integer.parseInt(a.get(6));
+                } else {
+                    id = "P-" + UUID.randomUUID().toString().substring(0, 5);
+                    name = a.get(2);
+                    price = Double.parseDouble(a.get(3));
+                    expiration = LocalDate.parse(a.get(4));
+                    maxPeople = Integer.parseInt(a.get(5));
+                }
+                try {
+                    Product p = catalog.add(new Food(id, name, price, expiration, maxPeople));
+                    System.out.println(p);
+                    System.out.println("prod addFood: ok");
+                } catch (Exception e) {
+                    System.out.println("Error creating Food: " + e.getMessage());
+                }
+            }
+            case "addMeeting" -> {
+                if (a.size() < 6) {
+                    System.out.println("Usage: prod addMeeting [<id>] \"<name>\" <price> <yyyy-MM-dd> <maxPeople>");
+                    return;
+                }
+                String id;
+                String name;
+                double price;
+                LocalDate expiration;
+                int maxPeople;
+
+                if (a.size() == 7) {
+                    id = a.get(2);
+                    name = a.get(3);
+                    price = Double.parseDouble(a.get(4));
+                    expiration = LocalDate.parse(a.get(5));
+                    maxPeople = Integer.parseInt(a.get(6));
+                } else {
+                    id = "P-" + UUID.randomUUID().toString().substring(0, 5);
+                    name = a.get(2);
+                    price = Double.parseDouble(a.get(3));
+                    expiration = LocalDate.parse(a.get(4));
+                    maxPeople = Integer.parseInt(a.get(5));
+                }
+                try {
+                    Product p = catalog.add(new Meeting(id, name, price, expiration, maxPeople));
+                    System.out.println(p);
+                    System.out.println("prod addMeeting: ok");
+                } catch (Exception e) {
+                    System.out.println("Error creating Meeting: " + e.getMessage());
+                }
             }
             case "list" -> {
                 System.out.println("Catalog:");
@@ -93,7 +161,6 @@ public final class CommandLoop {
                 String field = a.get(3);
                 String value = a.get(4);
                 Product p = catalog.get(id);
-
                 switch (field) {
                     case "NAME"     -> p.setName(value);
                     case "PRICE"    -> p.setPrice(Double.parseDouble(value));
@@ -184,7 +251,6 @@ public final class CommandLoop {
     }
 
     private static String trim(double v) {
-        String s = String.format(java.util.Locale.ROOT, "%.1f", v);
-        return s;
+        return String.format(java.util.Locale.ROOT, "%.1f", v);
     }
 }
