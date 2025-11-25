@@ -42,6 +42,6 @@ public final class Cashier {
 
     @Override
     public String toString() {
-        return "{class:Cashier, id:'" + id + "', name:'" + name + "', email:'" + email + "'}";
+        return "Cash{identifier='" + getId() + "', name='" + getName() + "', email='" + getEmail() + "'}";
     }
 }

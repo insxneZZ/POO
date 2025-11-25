@@ -24,10 +24,6 @@ public abstract class EventProduct extends Product {
     public LocalDate getExpiration() { return expiration; }
     public int getMaxPeople() { return maxPeople; }
 
-    /**
-     * Valída si la fecha del evento cumple con el tiempo mínimo de planificación
-     * respecto a una fecha de referencia (normalmente 'ahora' o fecha del ticket).
-     */
     public abstract void validatePlanningTime(LocalDateTime contextDate);
 
     @Override
@@ -36,7 +32,7 @@ public abstract class EventProduct extends Product {
                 ", id:" + getId() +
                 ", name:'" + getName() +
                 "', price:" + getPrice() +
-                ", expiration:" + expiration +
-                ", maxPeople:" + maxPeople + "}";
+                ", date of Event:" + getExpiration() +
+                ", max people allowed:" + getMaxPeople() + "}";
     }
 }

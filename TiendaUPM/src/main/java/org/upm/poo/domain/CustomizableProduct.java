@@ -13,10 +13,7 @@ public final class CustomizableProduct extends ItemProduct {
 
     @Override
     public String toString() {
-        return "{class:CustomizableProduct, id:" + getId() +
-                ", name:'" + getName() +
-                "', category:" + getCategory() +
-                ", price:" + getPrice() +
-                ", maxCustomizations:" + maxCustomizations + "}";
+        return "{class:ProductPersonalized, id:" + getId() + ", name:'" + getName() + "', category:" + getCategory() +
+                ", price:" + getPrice() + ", maxPersonal:" + getMaxCustomizations() + "}";
     }
 }

@@ -37,6 +37,6 @@ public final class Client {
 
     @Override
     public String toString() {
-        return "{class:Client, dni:'" + dni + "', name:'" + name + "', email:'" + email + "', createdBy:'" + creatorCashierId + "'}";
+        return "Client{identifier='" + getDni() + "', name='" + getName() + "', email='" + getEmail() + "', cash=" + getCreatorCashierId() + "}";
     }
 }
