@@ -7,14 +7,11 @@ import java.util.regex.Pattern;
 
 public final class CommandParser {
     private CommandParser() {}
-
-    // token = "…entre comillas…"  |  secuencia-sin-espacios
     private static final Pattern TOKEN = Pattern.compile("\"([^\"]*)\"|(\\S+)");
 
     public static List<String> splitArgs(String line) {
         if (line == null) return List.of();
 
-        // Normaliza comillas “curvas” y espacios raros a algo estable
         String s = normalize(line);
 
         List<String> out = new ArrayList<>();
@@ -28,7 +25,6 @@ public final class CommandParser {
     }
 
     private static String normalize(String in) {
-        // comillas curvas → "
         String s = in
                 .replace('“', '"') // “
                 .replace('”', '"') // ”

@@ -230,7 +230,7 @@ public final class CommandLoop {
             case "list" -> {
                 System.out.println("Ticket List:");
                 tickets.findAll().stream()
-                        .sorted((t1, t2) -> t1.getId().compareTo(t2.getId()))
+                        .sorted((t1, t2) -> t1.getCashierId().compareTo(t2.getCashierId()))
                         .forEach(t -> {
                             String st = switch(t.getState()) {
                                 case EMPTY -> "EMPTY";
@@ -295,7 +295,9 @@ public final class CommandLoop {
             case "remove" -> { userRegistry.removeClient(a.get(2)); System.out.println("client remove: ok"); }
             case "list" -> {
                 System.out.println("Client:");
-                userRegistry.listClients().forEach(c -> System.out.println("  " + c));
+                userRegistry.listClients().stream()
+                                .sorted(((c1, c2) -> c1.getName().compareTo(c2.getName())))
+                                .forEach(c -> System.out.println(" " + c));
                 System.out.println("client list: ok");
             }
         }
@@ -314,7 +316,9 @@ public final class CommandLoop {
             case "remove" -> { userRegistry.removeCashier(a.get(2)); System.out.println("cash remove: ok"); }
             case "list" -> {
                 System.out.println("Cash:");
-                userRegistry.listCashiers().forEach(c -> System.out.println("  " + c));
+                userRegistry.listCashiers().stream()
+                        .sorted(((c1, c2) -> c1.getName().compareTo(c2.getName())))
+                        .forEach(c -> System.out.println("  " + c));
                 System.out.println("cash list: ok");
             }
             case "tickets" -> {
@@ -322,6 +326,7 @@ public final class CommandLoop {
                 System.out.println("Tickets: ");
                 tickets.findAll().stream()
                         .filter(t -> t.getCashierId().equals(cId))
+                        .sorted((t1, t2) -> t1.getId().compareTo(t2.getId()))
                         .forEach(t -> {
                             String st = (t.getState() == TicketState.EMPTY) ? "EMPTY" : (t.getState()==TicketState.CLOSED?"CLOSE":"OPEN");
                             System.out.println("  " + t.getId() + "->" + st);
