@@ -1,12 +1,17 @@
 package org.upm.poo.domain.user;
 
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Objects;
 import java.util.Random;
 
-public final class Cashier {
+public final class Cashier implements Serializable {
     private final String id;
     private String name;
     private String email;
+    private final List<String> ticketIds = new ArrayList<>();
 
     public Cashier(String id, String name, String email) {
         if (name == null || name.isBlank()) throw new IllegalArgumentException("Name required");
@@ -29,6 +34,14 @@ public final class Cashier {
     public String getId() { return id; }
     public String getName() { return name; }
     public String getEmail() { return email; }
+
+    public List<String> getTicketIds() { return Collections.unmodifiableList(ticketIds); }
+
+    public void addTicketId(String ticketId) {
+        if(ticketId != null && !ticketIds.contains(ticketId)) {
+            ticketIds.add(ticketId);
+        }
+    }
 
     @Override
     public boolean equals(Object o) {

@@ -2,35 +2,77 @@ package org.upm.poo.service;
 
 import org.upm.poo.domain.user.Cashier;
 import org.upm.poo.domain.user.Client;
-
+import org.upm.poo.domain.user.Company;
+import org.upm.poo.domain.user.Customer;
 import java.util.*;
 
 public final class UserRegistry {
-    private final Map<String, Client> clients = new LinkedHashMap<>();
+    private final Map<String, Customer> customers = new LinkedHashMap<>();
     private final Map<String, Cashier> cashiers = new LinkedHashMap<>();
 
     public Client addClient(Client c) {
-        if (clients.containsKey(c.getDni())) {
-            throw new IllegalArgumentException("Client DNI already exists: " + c.getDni());
-        }
-        clients.put(c.getDni(), c);
+        addCustomer(c);
         return c;
+    }
+
+    public Company addCompany(Company c) {
+        addCustomer(c);
+        return c;
+    }
+
+    private void addCustomer(Customer c) {
+        if (customers.containsKey(c.getId())) {
+            throw new IllegalArgumentException("Customer ID (DNI/NIF) already exists: " + c.getId());
+        }
+        customers.put(c.getId(), c);
     }
 
     public Client getClient(String dni) {
-        Client c = clients.get(dni);
-        if (c == null) throw new NoSuchElementException("Client not found: " + dni);
+        Customer c = getCustomer(dni);
+        if (!(c instanceof Client)) throw new NoSuchElementException("ID " + dni + " is not a Client");
+        return (Client) c;
+    }
+
+    public Company getCompany(String nif) {
+        Customer c = getCustomer(nif);
+        if (!(c instanceof Company)) throw new NoSuchElementException("ID " + nif + " is not a Company");
+        return (Company) c;
+    }
+
+    public Customer getCustomer(String id) {
+        Customer c = customers.get(id);
+        if (c == null) throw new NoSuchElementException("Customer not found: " + id);
         return c;
     }
 
-    public Client removeClient(String dni) {
-        Client c = clients.remove(dni);
-        if (c == null) throw new NoSuchElementException("Client not found: " + dni);
+    public Customer removeCustomer(String id) {
+        Customer c = customers.remove(id);
+        if (c == null) throw new NoSuchElementException("Customer not found: " + id);
         return c;
+    }
+
+    // Métodos de compatibilidad para CommandLoop existente
+    public Client removeClient(String dni) {
+        Customer c = customers.get(dni);
+        if (c == null || !(c instanceof Client)) throw new NoSuchElementException("Client not found: " + dni);
+        customers.remove(dni);
+        return (Client) c;
     }
 
     public Collection<Client> listClients() {
-        return clients.values();
+        List<Client> list = new ArrayList<>();
+        for (Customer c : customers.values()) {
+            if (c instanceof Client cl) list.add(cl);
+        }
+        return list;
+    }
+
+    public Collection<Company> listCompanies() {
+        List<Company> list = new ArrayList<>();
+        for (Customer c : customers.values()) {
+            if (c instanceof Company co) list.add(co);
+        }
+        return list;
     }
 
     public Cashier addCashier(Cashier c) {
@@ -54,6 +96,6 @@ public final class UserRegistry {
     }
 
     public Collection<Cashier> listCashiers() {
-        return cashiers.values();
+        return Collections.unmodifiableCollection(cashiers.values());
     }
 }

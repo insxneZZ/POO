@@ -1,30 +1,31 @@
 package org.upm.poo.domain;
 
+import org.upm.poo.domain.user.Customer;
+
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
-public final class Ticket {
+public abstract class Ticket<T extends Customer> implements Serializable {
     private String id;
     private final String cashierId;
-    private final String clientId;
+    private final T customer;
     private TicketState state;
-
-    private final List<LineItem> items = new ArrayList<>();
-    private final DiscountPolicy policy = new CategoryQuantityDiscountPolicy();
+    protected final List<LineItem> items = new ArrayList<>();
     private static final DateTimeFormatter ID_FMT = DateTimeFormatter.ofPattern("yy-MM-dd-HH:mm");
 
-    public Ticket(String id, String cashierId, String clientId) {
+    protected Ticket(String id, String cashierId, T customer) {
         if (cashierId == null || cashierId.isBlank()) throw new IllegalArgumentException("Cashier ID required");
-        if (clientId == null || clientId.isBlank()) throw new IllegalArgumentException("Client ID required");
+        if (customer == null) throw new IllegalArgumentException("Customer required");
 
         this.cashierId = cashierId;
-        this.clientId = clientId;
+        this.customer = customer;
         this.state = TicketState.EMPTY;
         this.id = (id == null || id.isBlank()) ? generateInitialId() : id;
     }
 
-    private String generateInitialId() {
+    protected String generateInitialId() {
         String datePart = LocalDateTime.now().format(ID_FMT);
         int randomPart = 10000 + new Random().nextInt(90000);
         return datePart + "-" + randomPart;
@@ -32,11 +33,13 @@ public final class Ticket {
 
     public String getId() { return id; }
     public String getCashierId() { return cashierId; }
-    public String getClientId() { return clientId; }
+    public T getCustomer() { return customer; }
     public TicketState getState() { return state; }
     public List<LineItem> getItems() { return Collections.unmodifiableList(items); }
 
-    public void add(Product p, int q, List<String> customizations) {
+    public abstract void add(Product p, int q, List<String> customizations);
+
+    protected void addInternal(Product p, int q, List<String> customizations) {
         if (state == TicketState.CLOSED) {
             throw new IllegalStateException("Cannot add products to a CLOSED ticket");
         }
@@ -72,11 +75,6 @@ public final class Ticket {
         updateState();
     }
 
-    // Mantenemos el método antiguo redirigiendo al nuevo
-    public void add(Product p, int q) {
-        add(p, q, List.of());
-    }
-
     public void remove(String productId) {
         if (state == TicketState.CLOSED) {
             throw new IllegalStateException("Cannot remove products from a CLOSED ticket");
@@ -85,12 +83,10 @@ public final class Ticket {
         updateState();
     }
 
-    /**
-     * Cierra el ticket (facturación).
-     * Actualiza el ID agregando fecha de cierre y cambia estado a CLOSED.
-     */
     public void close() {
-        if (state == TicketState.CLOSED) return; // Ya cerrado
+        if (state == TicketState.CLOSED) return;
+
+        checkCloseConditions();
 
         LocalDateTime now = LocalDateTime.now();
         for (LineItem li : items) {
@@ -104,19 +100,16 @@ public final class Ticket {
         this.id = this.id + "-" + closeSuffix;
     }
 
+    protected abstract void checkCloseConditions();
+
     private void updateState() {
         if (state == TicketState.CLOSED) return;
         this.state = items.isEmpty() ? TicketState.EMPTY : TicketState.ACTIVE;
     }
 
-    public double totalPrice()   { return policy.totalPrice(items); }
-    public double totalDiscount(){ return policy.totalDiscount(items); }
-    public double finalPrice()   { return totalPrice() - totalDiscount(); }
+    public abstract double totalPrice();
+    public abstract double totalDiscount();
+    public double finalPrice() { return totalPrice() - totalDiscount(); }
 
-    public double unitDiscountFor(Category c, double unitPrice) {
-        int catUnits = items.stream()
-                .filter(li -> li.getProduct() instanceof ItemProduct ip && ip.getCategory() == c)
-                .mapToInt(LineItem::getQuantity).sum();
-        return policy.unitDiscount(c, unitPrice, catUnits);
-    }
+    public abstract double unitDiscountFor(Category c, double unitPrice);
 }

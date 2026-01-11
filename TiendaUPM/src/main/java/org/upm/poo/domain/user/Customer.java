@@ -1,37 +1,34 @@
 package org.upm.poo.domain.user;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
-public class Client extends Customer {
-    private final String dni;
+public abstract class Customer implements Serializable {
+    private final String id;
     private String name;
     private String email;
     private final String creatorCashierId;
-
     private final List<String> ticketIds = new ArrayList<>();
 
-    public Client(String dni, String name, String email, String creatorCashierId) {
-        super(dni, name, email, creatorCashierId);
-
-        if (dni == null || dni.isBlank()) throw new IllegalArgumentException("DNI required");
+    protected Customer(String id, String name, String email, String creatorCashierId) {
+        if (id == null || id.isBlank()) throw new IllegalArgumentException("ID required");
         if (name == null || name.isBlank()) throw new IllegalArgumentException("Name required");
         if (email == null || email.isBlank()) throw new IllegalArgumentException("Email required");
         if (creatorCashierId == null || creatorCashierId.isBlank()) throw new IllegalArgumentException("Creator Cashier ID required");
 
-        this.dni = dni;
+        this.id = id;
         this.name = name;
         this.email = email;
         this.creatorCashierId = creatorCashierId;
     }
 
-    public String getDni() { return dni; }
+    public String getId() { return id; }
     public String getName() { return name; }
     public String getEmail() { return email; }
     public String getCreatorCashierId() { return creatorCashierId; }
-
 
     public List<String> getTicketIds() { return Collections.unmodifiableList(ticketIds); }
 
@@ -44,15 +41,15 @@ public class Client extends Customer {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof Client client)) return false;
-        return Objects.equals(dni, client.dni);
+        if (!(o instanceof Customer customer)) return false;
+        return Objects.equals(id, customer.id);
     }
 
     @Override
-    public int hashCode() { return Objects.hash(dni); }
+    public int hashCode() { return Objects.hash(id); }
 
     @Override
     public String toString() {
-        return "Client{identifier='" + getDni() + "', name='" + getName() + "', email='" + getEmail() + "', cash=" + getCreatorCashierId() + "}";
+        return getClass().getSimpleName() + "{identifier='" + getId() + "', name='" + getName() + "', email='" + getEmail() + "', cash=" + getCreatorCashierId() + "}";
     }
 }

@@ -3,6 +3,8 @@ package org.upm.poo.cli;
 import org.upm.poo.domain.*;
 import org.upm.poo.domain.user.Cashier;
 import org.upm.poo.domain.user.Client;
+import org.upm.poo.domain.user.Company;
+import org.upm.poo.domain.user.Customer;
 import org.upm.poo.service.Catalog;
 import org.upm.poo.service.TicketService;
 import org.upm.poo.service.UserRegistry;
@@ -70,6 +72,9 @@ public final class CommandLoop {
                             default       -> System.out.println("Unknown command. Type 'help'.");
                         }
                     } catch (Exception ex) {
+                        // Gestión de excepciones silenciosa en terminal (E3)
+                        // "No se mostrarán por terminal errores... mecanismo de control justificado"
+                        // Mostramos mensaje simple para feedback, pero no stacktrace.
                         System.out.println("Error: " + ex.getMessage());
                     }
                 }
@@ -80,12 +85,7 @@ public final class CommandLoop {
     }
 
     private void printHelp() {
-        System.out.println("Commands:");
-        System.out.println("  prod add ... / addFood ... / addMeeting ... / list / update / remove");
-        System.out.println("  client add ... / remove / list");
-        System.out.println("  cash add ... / remove / list / tickets");
-        System.out.println("  ticket new / add / remove / print / list");
-        System.out.println("  help / exit / echo");
+        System.out.println("Commands help available in documentation.");
     }
 
     // --- PRODUCTOS ---
@@ -93,20 +93,44 @@ public final class CommandLoop {
         if (a.size() < 2) return;
         switch (a.get(1)) {
             case "add" -> {
-                String id = null, name; Category cat; double price; Integer maxPers = null;
+                // prod add <exp> <category> -> E3 new format for services/prods?
+                // Enunciado E3: "prod add <expiration> <category>" ? No parece encajar con el anterior.
+                // Asumimos compatibilidad. Si hay fecha y categoría podría ser servicio o producto especial.
+                // Revisando enunciado E3: "Se agregan Producto-Servicios... no tendrán precio... solo fecha máxima"
+                // Comando E3: prod add <expiration: yyyy-MM-dd> <category>
+                // OJO: El enunciado E3 tiene una errata o cambio fuerte en "prod add".
+                // Asumimos que si entra expiration y category es un SERVICIO (Transporte/Espectaculo/Seguro).
 
+                // Lógica híbrida para soportar E1/E2 y E3
+                if (a.size() == 4 && isDate(a.get(2))) {
+                    // E3 Service: prod add 2025-12-31 TRANSPORTE
+                    String dateStr = a.get(2);
+                    String catStr = a.get(3);
+                    String id = generateServiceId();
+                    LocalDate exp = LocalDate.parse(dateStr);
+
+                    Service s = null;
+                    if (catStr.equalsIgnoreCase("TRANSPORTE")) s = new TransportService(id, exp);
+                    else if (catStr.equalsIgnoreCase("ESPECTACULO")) s = new ShowService(id, exp);
+                    else if (catStr.equalsIgnoreCase("SEGURO")) s = new InsuranceService(id, exp);
+                    else throw new IllegalArgumentException("Unknown service category: " + catStr);
+
+                    catalog.add(s);
+                    System.out.println(s);
+                    System.out.println("prod add: ok");
+                    return;
+                }
+
+                // Lógica E2 (Standard Products)
+                String id = null, name; Category cat; double price; Integer maxPers = null;
                 int catIdx = -1;
                 if (a.size() > 3 && isCategory(a.get(3))) catIdx = 3;
                 else if (a.size() > 4 && isCategory(a.get(4))) catIdx = 4;
 
-                if (catIdx == -1) { System.out.println("Usage error: check category"); return; }
+                if (catIdx == -1) { System.out.println("Usage error: check category or params"); return; }
 
-                if (catIdx == 4) {
-                    id = a.get(2); name = a.get(3);
-                } else {
-                    id = "P-" + UUID.randomUUID().toString().substring(0, 5);
-                    name = a.get(2);
-                }
+                if (catIdx == 4) { id = a.get(2); name = a.get(3); }
+                else { id = "P-" + UUID.randomUUID().toString().substring(0, 5); name = a.get(2); }
 
                 cat = Category.valueOf(a.get(catIdx));
                 price = Double.parseDouble(a.get(catIdx + 1));
@@ -123,13 +147,9 @@ public final class CommandLoop {
             case "addFood", "addMeeting" -> {
                 boolean isFood = a.get(1).equals("addFood");
                 String id, name; double price; LocalDate exp; int maxP;
-
                 int offset = 0;
-                if (a.size() == 7) {
-                    id = a.get(2); offset = 1;
-                } else {
-                    id = (isFood ? "F-" : "M-") + UUID.randomUUID().toString().substring(0, 5);
-                }
+                if (a.size() == 7) { id = a.get(2); offset = 1; }
+                else { id = (isFood ? "F-" : "M-") + UUID.randomUUID().toString().substring(0, 5); }
 
                 name = a.get(2 + offset);
                 price = Double.parseDouble(a.get(3 + offset));
@@ -149,11 +169,9 @@ public final class CommandLoop {
             case "update" -> {
                 Product p = catalog.get(a.get(2));
                 String val = a.get(4);
-                switch (a.get(3)) {
-                    case "NAME" -> p.setName(val);
-                    case "PRICE" -> p.setPrice(Double.parseDouble(val));
-                    case "CATEGORY" -> { if(p instanceof ItemProduct ip) ip.setCategory(Category.valueOf(val)); }
-                }
+                if (a.get(3).equals("NAME")) p.setName(val);
+                else if (a.get(3).equals("PRICE")) p.setPrice(Double.parseDouble(val));
+                else if (a.get(3).equals("CATEGORY") && p instanceof ItemProduct ip) ip.setCategory(Category.valueOf(val));
                 System.out.println(p);
                 System.out.println("prod update: ok");
             }
@@ -164,24 +182,37 @@ public final class CommandLoop {
         }
     }
 
-    private boolean isCategory(String s) { try { Category.valueOf(s); return true; } catch (Exception e) { return false; } }
-
     // --- TICKETS ---
     private void handleTicket(List<String> a) {
         if (a.size() < 2) return;
         switch (a.get(1)) {
             case "new" -> {
-                String id = null, cashId, userId;
-                if (a.size() == 5) { id = a.get(2); cashId = a.get(3); userId = a.get(4); }
-                else { cashId = a.get(2); userId = a.get(3); }
+                // ticket new [<id>] <cashId> <userId> -[c/p/s]
+                // Detectar si hay ID opcional
+                String id = null, cashId, userId, flag = "-p";
 
-                Ticket t = tickets.createTicket(id, cashId, userId);
-                printTicketState(t);
+                int idx = 2;
+                if (!userRegistry.listCashiers().stream().anyMatch(c->c.getId().equals(a.get(2))) && a.size() >= 5) {
+                    id = a.get(idx++);
+                }
+                cashId = a.get(idx++);
+                userId = a.get(idx++);
+                if (idx < a.size()) flag = a.get(idx);
+
+                Cashier c = userRegistry.getCashier(cashId);
+                Customer cust = userRegistry.getCustomer(userId);
+
+                Ticket<?> t = tickets.createTicket(id, cashId, userId, flag);
+
+                c.addTicketId(t.getId());
+                cust.addTicketId(t.getId());
+
+                // Impresión de estado usando Printer
+                getPrinter(t).print(t);
                 System.out.println("ticket new: ok");
             }
             case "add" -> {
                 String tId = a.get(2); String cashId = a.get(3); String pId = a.get(4); int qty = Integer.parseInt(a.get(5));
-
                 List<String> customs = new ArrayList<>();
                 for (int i = 6; i < a.size(); i++) {
                     String arg = a.get(i);
@@ -194,24 +225,11 @@ public final class CommandLoop {
                 Ticket t = tickets.getTicket(tId);
                 tickets.verifyOwner(t, cashId);
                 Product p = catalog.get(pId);
-                t.add(p, qty, customs);
 
-                printTicketHeader(t);
+                // Raw casting seguro porque el ticket valida internamente
+                ((Ticket)t).add(p, qty, customs);
 
-                double base = p.getPrice();
-                double extra = (!customs.isEmpty()) ? base * 0.10 * customs.size() : 0.0;
-                double finalU = base + extra;
-                double uDisc = 0.0;
-                if (p instanceof ItemProduct ip) uDisc = t.unitDiscountFor(ip.getCategory(), finalU);
-
-                for(int i = 0; i < qty; i++) {
-                    String info = p.toString();
-                    if (!customs.isEmpty()) info += " " + customs;
-
-                    if (uDisc > 0) System.out.println("  " + info + " **discount -" + trim(uDisc));
-                    else System.out.println("  " + info);
-                }
-                printTicketTotals(t);
+                getPrinter(t).print(t);
                 System.out.println("ticket add: ok");
             }
             case "remove" -> {
@@ -224,13 +242,13 @@ public final class CommandLoop {
                 Ticket t = tickets.getTicket(a.get(2));
                 tickets.verifyOwner(t, a.get(3));
                 t.close();
-                printTicketDetails(t);
+                getPrinter(t).print(t);
                 System.out.println("ticket print: ok");
             }
             case "list" -> {
                 System.out.println("Ticket List:");
                 tickets.findAll().stream()
-                        .sorted((t1, t2) -> t1.getCashierId().compareTo(t2.getCashierId()))
+                        .sorted((t1, t2) -> t1.getId().compareTo(t2.getId()))
                         .forEach(t -> {
                             String st = switch(t.getState()) {
                                 case EMPTY -> "EMPTY";
@@ -244,44 +262,9 @@ public final class CommandLoop {
         }
     }
 
-    private void printTicketState(Ticket t) {
-        printTicketHeader(t);
-        printTicketTotals(t);
-    }
-
-    private void printTicketHeader(Ticket t) {
-        System.out.println("Ticket : " + t.getId());
-    }
-
-    private void printTicketTotals(Ticket t) {
-        System.out.println("  Total price: " + trim(t.totalPrice()));
-        System.out.println("  Total discount: " + trim(t.totalDiscount()));
-        System.out.println("  Final Price: " + trim(t.finalPrice()));
-    }
-
-    private void printTicketDetails(Ticket t) {
-        printTicketHeader(t);
-        t.getItems().stream()
-                .sorted((l1, l2) -> l1.getProduct().getName().compareToIgnoreCase(l2.getProduct().getName()))
-                .forEach(li -> {
-                    Product p = li.getProduct();
-
-                    double base = p.getPrice();
-                    double extra = (!li.getCustomizations().isEmpty()) ? base * 0.10 * li.getCustomizations().size() : 0.0;
-                    double finalU = base + extra;
-
-                    double uDisc = 0.0;
-                    if (p instanceof ItemProduct ip) uDisc = t.unitDiscountFor(ip.getCategory(), finalU);
-
-                    for(int i=0; i<li.getQuantity(); i++) {
-                        String info = p.toString();
-                        if(!li.getCustomizations().isEmpty()) info += " " + li.getCustomizations();
-
-                        if (uDisc > 0) System.out.println("  " + info + " **discount -" + trim(uDisc));
-                        else System.out.println("  " + info);
-                    }
-                });
-        printTicketTotals(t);
+    private ITicketPrinter getPrinter(Ticket<?> t) {
+        if (t instanceof EnterpriseTicket) return new EnterpriseTicketPrinter();
+        return new StandardTicketPrinter();
     }
 
     // --- USUARIOS ---
@@ -289,15 +272,37 @@ public final class CommandLoop {
         if (a.size() < 2) return;
         switch (a.get(1)) {
             case "add" -> {
-                Client c = userRegistry.addClient(new Client(a.get(3), a.get(2), a.get(4), a.get(5)));
-                System.out.println(c); System.out.println("client add: ok");
+                // client add "<name>" (<DNI>|<NIF>) <email> <cashld>
+                String name = a.get(2);
+                String id = a.get(3); // DNI or NIF
+                String email = a.get(4);
+                String cashId = a.get(5);
+
+                // Detección automática por formato
+                // NIF: 8 dígitos + Letra (Empresa) -> No, NIF empresa suele empezar por letra.
+                // Enunciado E3: "identificados por NIF".
+                // Asumiremos convención simple: Si empieza por letra -> Empresa, Si empieza por número -> Cliente (DNI).
+                // O según PDF E3 "aceptara NIF y decidirá el tipo de usuario".
+
+                boolean isCompany = Character.isLetter(id.charAt(0));
+
+                if (isCompany) {
+                    Company c = userRegistry.addCompany(new Company(id, name, email, cashId));
+                    System.out.println(c);
+                } else {
+                    Client c = userRegistry.addClient(new Client(id, name, email, cashId));
+                    System.out.println(c);
+                }
+                System.out.println("client add: ok");
             }
-            case "remove" -> { userRegistry.removeClient(a.get(2)); System.out.println("client remove: ok"); }
+            case "remove" -> {
+                userRegistry.removeCustomer(a.get(2));
+                System.out.println("client remove: ok");
+            }
             case "list" -> {
                 System.out.println("Client:");
-                userRegistry.listClients().stream()
-                                .sorted(((c1, c2) -> c1.getName().compareTo(c2.getName())))
-                                .forEach(c -> System.out.println(" " + c));
+                userRegistry.listClients().forEach(c -> System.out.println("  " + c));
+                userRegistry.listCompanies().forEach(c -> System.out.println("  " + c));
                 System.out.println("client list: ok");
             }
         }
@@ -313,12 +318,14 @@ public final class CommandLoop {
                 Cashier c = userRegistry.addCashier(new Cashier(id, name, email));
                 System.out.println(c); System.out.println("cash add: ok");
             }
-            case "remove" -> { userRegistry.removeCashier(a.get(2)); System.out.println("cash remove: ok"); }
+            case "remove" -> {
+                tickets.removeTicketsByCashier(a.get(2));
+                userRegistry.removeCashier(a.get(2));
+                System.out.println("cash remove: ok");
+            }
             case "list" -> {
                 System.out.println("Cash:");
-                userRegistry.listCashiers().stream()
-                        .sorted(((c1, c2) -> c1.getName().compareTo(c2.getName())))
-                        .forEach(c -> System.out.println("  " + c));
+                userRegistry.listCashiers().forEach(c -> System.out.println("  " + c));
                 System.out.println("cash list: ok");
             }
             case "tickets" -> {
@@ -326,7 +333,6 @@ public final class CommandLoop {
                 System.out.println("Tickets: ");
                 tickets.findAll().stream()
                         .filter(t -> t.getCashierId().equals(cId))
-                        .sorted((t1, t2) -> t1.getId().compareTo(t2.getId()))
                         .forEach(t -> {
                             String st = (t.getState() == TicketState.EMPTY) ? "EMPTY" : (t.getState()==TicketState.CLOSED?"CLOSE":"OPEN");
                             System.out.println("  " + t.getId() + "->" + st);
@@ -336,5 +342,9 @@ public final class CommandLoop {
         }
     }
 
-    private static String trim(double v) { return String.format(java.util.Locale.ROOT, "%.1f", v); }
+    private boolean isCategory(String s) { try { Category.valueOf(s); return true; } catch (Exception e) { return false; } }
+    private boolean isDate(String s) { try { LocalDate.parse(s); return true; } catch (Exception e) { return false; } }
+
+    private int serviceSeq = 1;
+    private String generateServiceId() { return (serviceSeq++) + "S"; }
 }

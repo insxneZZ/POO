@@ -1,50 +1,38 @@
 package org.upm.poo.domain;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public final class LineItem {
+public class LineItem implements Serializable {
     private final Product product;
     private int quantity;
     private final List<String> customizations;
 
     public LineItem(Product product, int quantity, List<String> customizations) {
-        if (product == null) throw new IllegalArgumentException("product required");
-        if (quantity <= 0) throw new IllegalArgumentException("quantity must be > 0");
         this.product = product;
         this.quantity = quantity;
-        this.customizations = (customizations == null) ? List.of() : new ArrayList<>(customizations);
-    }
-
-    public LineItem(Product product, int quantity) {
-        this(product, quantity, List.of());
+        this.customizations = new ArrayList<>(customizations);
     }
 
     public Product getProduct() { return product; }
     public int getQuantity() { return quantity; }
     public List<String> getCustomizations() { return Collections.unmodifiableList(customizations); }
 
-    public void add(int q) {
-        if (q <= 0) throw new IllegalArgumentException("quantity must be > 0");
-        this.quantity += q;
-    }
-
-    public double subtotal() {
-        double unitPrice = product.getPrice();
-
-        if (!customizations.isEmpty()) {
-            double surcharge = unitPrice * 0.10 * customizations.size();
-            unitPrice += surcharge;
-        }
-
-        return unitPrice * quantity;
-    }
+    public void add(int q) { this.quantity += q; }
 
     public boolean represents(Product p, List<String> customs) {
-        if (!this.product.equals(p)) return false;
+        return this.product.equals(p) && this.customizations.equals(customs);
+    }
 
-        if (this.customizations.size() != customs.size()) return false;
-        return this.customizations.equals(customs);
+    public double getUnitPrice() {
+        double base = product.getPrice();
+        double extra = (!customizations.isEmpty()) ? base * 0.10 * customizations.size() : 0.0;
+        return base + extra;
+    }
+
+    public double getTotalPrice() {
+        return getUnitPrice() * quantity;
     }
 }
