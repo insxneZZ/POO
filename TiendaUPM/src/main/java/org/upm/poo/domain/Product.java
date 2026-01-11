@@ -17,6 +17,9 @@ public class Product {
     public String getId() { return id; }
     public String getName() { return name; }
     public double getPrice() { return price; }
+    public String getType() {
+        return this.getClass().getSimpleName();
+    }
 
     public void setName(String name) {
         if (name == null || name.isBlank()) throw new IllegalArgumentException("name required");

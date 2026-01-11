@@ -1,10 +1,11 @@
 package org.upm.poo.service;
 
-import org.upm.poo.domain.Product;
+import org.upm.poo.domain.*;
 import java.util.*;
 
 public final class Catalog {
     private final Map<String, Product> products = new LinkedHashMap<>();
+    private int serviceCounter = 0;
 
     public Product add(Product p) {
         if (products.containsKey(p.getId()))
@@ -26,5 +27,10 @@ public final class Catalog {
         if (removed == null)
             throw new NoSuchElementException("Product not found: " + id);
         return removed;
+    }
+
+    public String generateServiceId() {
+        serviceCounter++;
+        return serviceCounter + "S";
     }
 }

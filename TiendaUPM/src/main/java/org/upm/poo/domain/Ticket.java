@@ -9,9 +9,10 @@ public final class Ticket {
     private final String cashierId;
     private final String clientId;
     private TicketState state;
+    private transient TicketPolicy policy;
 
     private final List<LineItem> items = new ArrayList<>();
-    private final DiscountPolicy policy = new CategoryQuantityDiscountPolicy();
+
     private static final DateTimeFormatter ID_FMT = DateTimeFormatter.ofPattern("yy-MM-dd-HH:mm");
 
     public Ticket(String id, String cashierId, String clientId) {
@@ -22,6 +23,16 @@ public final class Ticket {
         this.clientId = clientId;
         this.state = TicketState.EMPTY;
         this.id = (id == null || id.isBlank()) ? generateInitialId() : id;
+
+        this.policy = new StandardTicketPolicy();
+    }
+
+    public void setPolicy(TicketPolicy policy) {
+        this.policy = policy;
+    }
+
+    public TicketPolicy getPolicy() {
+        return policy;
     }
 
     private String generateInitialId() {
@@ -40,6 +51,8 @@ public final class Ticket {
         if (state == TicketState.CLOSED) {
             throw new IllegalStateException("Cannot add products to a CLOSED ticket");
         }
+
+        policy.checkAddition(p);
 
         if (p instanceof EventProduct) {
             boolean exists = items.stream().anyMatch(li -> li.getProduct().equals(p));
@@ -72,7 +85,6 @@ public final class Ticket {
         updateState();
     }
 
-    // Mantenemos el método antiguo redirigiendo al nuevo
     public void add(Product p, int q) {
         add(p, q, List.of());
     }
@@ -85,12 +97,8 @@ public final class Ticket {
         updateState();
     }
 
-    /**
-     * Cierra el ticket (facturación).
-     * Actualiza el ID agregando fecha de cierre y cambia estado a CLOSED.
-     */
     public void close() {
-        if (state == TicketState.CLOSED) return; // Ya cerrado
+        if (state == TicketState.CLOSED) return;
 
         LocalDateTime now = LocalDateTime.now();
         for (LineItem li : items) {
@@ -109,14 +117,25 @@ public final class Ticket {
         this.state = items.isEmpty() ? TicketState.EMPTY : TicketState.ACTIVE;
     }
 
-    public double totalPrice()   { return policy.totalPrice(items); }
-    public double totalDiscount(){ return policy.totalDiscount(items); }
-    public double finalPrice()   { return totalPrice() - totalDiscount(); }
+    public double totalPrice() {
+        return items.stream().mapToDouble(LineItem::subtotal).sum();
+    }
+
+    public double totalDiscount() {
+        return policy.calculateTotalDiscount(this);
+    }
+
+    public double finalPrice() {
+        return policy.calculateFinalPrice(this);
+    }
 
     public double unitDiscountFor(Category c, double unitPrice) {
-        int catUnits = items.stream()
-                .filter(li -> li.getProduct() instanceof ItemProduct ip && ip.getCategory() == c)
-                .mapToInt(LineItem::getQuantity).sum();
-        return policy.unitDiscount(c, unitPrice, catUnits);
+        if (policy instanceof StandardTicketPolicy stp) {
+            int catUnits = items.stream()
+                    .filter(li -> li.getProduct() instanceof ItemProduct ip && ip.getCategory() == c)
+                    .mapToInt(LineItem::getQuantity).sum();
+            return new CategoryQuantityDiscountPolicy().unitDiscount(c, unitPrice, catUnits);
+        }
+        return 0.0;
     }
 }

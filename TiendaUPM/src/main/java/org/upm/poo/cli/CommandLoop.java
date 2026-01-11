@@ -1,11 +1,9 @@
 package org.upm.poo.cli;
 
 import org.upm.poo.domain.*;
-import org.upm.poo.domain.user.Cashier;
+import org.upm.poo.service.*;
 import org.upm.poo.domain.user.Client;
-import org.upm.poo.service.Catalog;
-import org.upm.poo.service.TicketService;
-import org.upm.poo.service.UserRegistry;
+import org.upm.poo.domain.user.Cashier;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -161,6 +159,22 @@ public final class CommandLoop {
                 System.out.println(catalog.remove(a.get(2)));
                 System.out.println("prod remove: ok");
             }
+            case "addService" -> {
+                if (a.size() < 3) {
+                    System.out.println("Usage: prod addService <yyyy-MM-dd>");
+                    return;
+                }
+
+                LocalDate exp = LocalDate.parse(a.get(2));
+
+                String id = catalog.generateServiceId();
+
+                ServiceProduct sp = new ServiceProduct(id, exp);
+                catalog.add(sp);
+
+                System.out.println(sp);
+                System.out.println("prod addService: ok");
+            }
         }
     }
 
@@ -313,7 +327,14 @@ public final class CommandLoop {
                 Cashier c = userRegistry.addCashier(new Cashier(id, name, email));
                 System.out.println(c); System.out.println("cash add: ok");
             }
-            case "remove" -> { userRegistry.removeCashier(a.get(2)); System.out.println("cash remove: ok"); }
+            case "remove" -> {
+                String cId = a.get(2);
+                tickets.removeTicketsByCashier(cId);
+
+                userRegistry.removeCashier(cId);
+
+                System.out.println("cash remove: ok");
+            }
             case "list" -> {
                 System.out.println("Cash:");
                 userRegistry.listCashiers().stream()

@@ -2,21 +2,24 @@ package org.upm.poo;
 
 import org.upm.poo.cli.CommandLoop;
 import org.upm.poo.service.Catalog;
+import org.upm.poo.service.PersistenceService;
 import org.upm.poo.service.TicketService;
 import org.upm.poo.service.UserRegistry;
 
-public final class Main {
-    public static void main(String[] args) throws Exception {
+public class Main {
+    public static void main(String[] args) {
         Catalog catalog = new Catalog();
-        TicketService ticketService = new TicketService();
         UserRegistry userRegistry = new UserRegistry();
+        TicketService ticketService = new TicketService(userRegistry);
 
-        CommandLoop cli = new CommandLoop(catalog, ticketService, userRegistry);
+        PersistenceService persistence = new PersistenceService();
+        persistence.load(catalog, userRegistry, ticketService);
 
-        if (args.length > 0) {
-            cli.run(args[0]);
-        } else {
-            cli.run(null);
-        }
+        CommandLoop app = new CommandLoop(catalog, ticketService, userRegistry);
+
+        String inputPath = (args.length > 0) ? args[0] : null;
+        app.run(inputPath);
+
+        persistence.save(catalog, userRegistry, ticketService);
     }
 }
