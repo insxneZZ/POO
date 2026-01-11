@@ -1,0 +1,238 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="a142bb3e-dadd-4941-806d-a38c592948c0" name="Changes" comment="fix(cli): corrige ordenacion en comandos list segun enunciado&#10;&#10;- Ordena 'client list' alfabéticamente por nombre&#10;- Ordena 'cash list' alfabéticamente por nombre&#10;- Ordena 'cash tickets' por ID del ticket&#10;- Ordena 'ticket list' agrupando por ID del cajero">
+      <change afterPath="$PROJECT_DIR$/src/main/java/org/upm/poo/cli/EnterpriseTicketPrinter.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/org/upm/poo/cli/ITicketPrinter.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/org/upm/poo/cli/StandardTicketPrinter.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/org/upm/poo/cli/TicketPrinter.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/org/upm/poo/domain/EnterpriseTicket.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/org/upm/poo/domain/InsuranceService.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/org/upm/poo/domain/Service.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/org/upm/poo/domain/ServiceType.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/org/upm/poo/domain/ShowService.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/org/upm/poo/domain/TicketStrategy.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/org/upm/poo/domain/TransportService.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/org/upm/poo/domain/User.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/org/upm/poo/domain/user/Company.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/org/upm/poo/domain/user/Customer.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/org/upm/poo/domain/user/StandardTicket.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/org/upm/poo/io/AppPersister.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/upm/poo/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/upm/poo/Main.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/upm/poo/cli/CommandLoop.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/upm/poo/cli/CommandLoop.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/upm/poo/domain/DiscountPolicy.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/upm/poo/domain/DiscountPolicy.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/upm/poo/domain/LineItem.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/upm/poo/domain/LineItem.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/upm/poo/domain/Product.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/upm/poo/domain/Product.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/upm/poo/domain/Ticket.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/upm/poo/domain/Ticket.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/upm/poo/domain/user/Cashier.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/upm/poo/domain/user/Cashier.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/upm/poo/domain/user/Client.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/upm/poo/domain/user/Client.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/upm/poo/service/TicketService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/upm/poo/service/TicketService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/upm/poo/service/UserRegistry.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/upm/poo/service/UserRegistry.java" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Enum" />
+        <option value="Class" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
+  </component>
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;insxneZZ&quot;
+  }
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/insxneZZ/POO.git&quot;,
+    &quot;accountId&quot;: &quot;f49641ff-2c25-4150-b9e0-daa41af8b847&quot;
+  }
+}</component>
+  <component name="McpProjectServerCommands">
+    <commands />
+    <urls />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 2
+}</component>
+  <component name="ProjectId" id="35yZx7kdWsrrK8TC7X4NOg5Z47g" />
+  <component name="ProjectLevelVcsManager">
+    <ConfirmationsSetting value="2" id="Add" />
+  </component>
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Application.Main.executor": "Run",
+    "Application.TiendaUPM-Traza.executor": "Run",
+    "Maven.TiendaUPM [clean].executor": "Run",
+    "Maven.TiendaUPM [package].executor": "Run",
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RunOnceActivity.MCP Project settings loaded": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
+    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "git-widget-placeholder": "feature()-Segunda-Entrega",
+    "ignore.virus.scanning.warn.message": "true",
+    "kotlin-language-version-configured": "true",
+    "last_opened_file_path": "C:/Users/adria/Desktop/Proyectos Personales/UPM/TiendaUPM/POO/TiendaUPM",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "project.structure.last.edited": "Project",
+    "project.structure.proportion": "0.0",
+    "project.structure.side.proportion": "0.0",
+    "settings.editor.selected.configurable": "project.propCompiler",
+    "vue.rearranger.settings.migration": "true"
+  }
+}]]></component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\adria\Desktop\Proyectos Personales\UPM\TiendaUPM\POO\TiendaUPM" />
+    </key>
+  </component>
+  <component name="RunManager">
+    <configuration name="TiendaUPM-Traza" type="Application" factoryName="Application">
+      <option name="MAIN_CLASS_NAME" value="org.upm.poo.Main" />
+      <module name="TiendaUPM" />
+      <option name="PROGRAM_PARAMETERS" value="TrazaEjemplo.txt" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-jdk-30f59d01ecdd-26cb7f24e5b0-intellij.indexing.shared.core-IU-253.29346.240" />
+        <option value="bundled-js-predefined-d6986cc7102b-9b0f141eb926-JavaScript-IU-253.29346.240" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="a142bb3e-dadd-4941-806d-a38c592948c0" name="Changes" comment="" />
+      <created>1764084516044</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1764084516044</updated>
+      <workItem from="1764084518027" duration="7596000" />
+      <workItem from="1764523519343" duration="64000" />
+      <workItem from="1764523601501" duration="159000" />
+      <workItem from="1764598444059" duration="1526000" />
+      <workItem from="1767539906114" duration="82000" />
+      <workItem from="1767540038251" duration="7000" />
+      <workItem from="1767540055855" duration="2906000" />
+      <workItem from="1768119695846" duration="156000" />
+      <workItem from="1768119981908" duration="22000" />
+      <workItem from="1768120012314" duration="5339000" />
+    </task>
+    <task id="LOCAL-00001" summary="fix: Update Catalog, Ticket, and CLI to support new Product hierarchy&#10;&#10;- Update Catalog to use String keys for product IDs instead of Integers.&#10;- Modify CategoryQuantityDiscountPolicy and Ticket to support ItemProduct checks, preventing errors with non-categorized products.&#10;- Refactor CommandLoop to parse String IDs and instantiate StandardProduct correctly.&#10;- Resolve all compilation errors resulting from the initial Product refactor.">
+      <option name="closed" value="true" />
+      <created>1764085084235</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1764085084235</updated>
+    </task>
+    <task id="LOCAL-00002" summary="feat: Implement EventProduct hierarchy with Food and Meeting types&#10;&#10;- Introduce EventProduct abstract class for products with expiration dates and capacity limits (max 100 people).&#10;- Implement Food class with a mandatory 3-day minimum planning time validation.&#10;- Implement Meeting class with a 12-hour minimum planning time validation.&#10;- Enforce temporal constraints to prevent creating events in the past or with insufficient notice.">
+      <option name="closed" value="true" />
+      <created>1764085376340</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1764085376340</updated>
+    </task>
+    <task id="LOCAL-00003" summary="feat: Add CLI support for Food and Meeting products&#10;&#10;- Update CommandLoop to handle 'addFood' and 'addMeeting' commands.&#10;- Implement automatic ID generation (UUID-based) when ID is omitted.&#10;- Add error handling for temporal constraints (3-day/12-hour rules) in the CLI.&#10;- Update help menu to reflect new commands.">
+      <option name="closed" value="true" />
+      <created>1764086550194</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1764086550194</updated>
+    </task>
+    <task id="LOCAL-00004" summary="feat: Implement User domain and Registry service&#10;&#10;- Create Client class with DNI as identifier and reference to creator Cashier.&#10;- Create Cashier class with automatic ID generation (UW prefix) and validation.&#10;- Implement UserRegistry service to manage unique collections of Clients and Cashiers.">
+      <option name="closed" value="true" />
+      <created>1764087720651</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1764087720651</updated>
+    </task>
+    <task id="LOCAL-00005" summary="feat: Implement User management and advanced Ticket logic&#10;&#10;- Add Client and Cashier domain classes with ID validation.&#10;- Implement UserRegistry service to manage actors.&#10;- Overhaul Ticket entity: introduce states (EMPTY, ACTIVE, CLOSED), owner tracking, and ID generation with timestamps.&#10;- Update TicketService to support repository pattern and owner security checks.&#10;- Update CLI to support new user commands and strict ticket syntax (requiring IDs).">
+      <option name="closed" value="true" />
+      <created>1764088918819</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1764088918819</updated>
+    </task>
+    <task id="LOCAL-00006" summary="feat: Enable file input mode and refine CLI for full trace compliance&#10;&#10;- Update Main to accept an optional file path argument for batch execution.&#10;- Modify CommandLoop to support file reading and echo commands to standard output (required for auto-correction).&#10;- Improve 'ticket add' parser to handle concatenated flags (e.g., --pred) used in test traces.&#10;- Implement 'cash tickets' command to list tickets filtered by cashier.&#10;- Ensure full compatibility with the provided 'TrazaEjemplo.txt'.">
+      <option name="closed" value="true" />
+      <created>1764089744930</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1764089744930</updated>
+    </task>
+    <task id="LOCAL-00007" summary="refactor: Final Polish for Entrega 2 CLI output&#10;&#10;- Harmonize CommandLoop output format to match expected trace logs (header styles, state labels).&#10;- Adjust domain classes toString() methods to use requested labels (e.g., 'ProductPersonalized', 'identifier').&#10;- Ensure file-mode execution accurately mirrors interactive session output for auto-correction.&#10;- Fix logic to display correct real prices while maintaining strict adherence to PDF requirements.">
+      <option name="closed" value="true" />
+      <created>1764091272711</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1764091272711</updated>
+    </task>
+    <task id="LOCAL-00008" summary="feat: Finalize E2 implementation and align CLI output with trace&#10;&#10;- Update CategoryQuantityDiscountPolicy to calculate discounts based on the final unit price (including customizations), matching the provided trace logic.&#10;- Refactor CommandLoop to support file execution with command echoing.&#10;- Adjust toString() methods in Domain classes (Product, Client, Cashier) to match specific output formats (e.g., 'identifier', 'ProductPersonalized').&#10;- Harmonize CLI output headers and state labels (OPEN/CLOSE) with the expected trace.&#10;- Fix 'ticket add' parser to handle concatenated customization flags (e.g., --pred).">
+      <option name="closed" value="true" />
+      <created>1764091774225</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1764091774225</updated>
+    </task>
+    <task id="LOCAL-00009" summary="fix(cli): corrige ordenacion en comandos list segun enunciado&#10;&#10;- Ordena 'client list' alfabéticamente por nombre&#10;- Ordena 'cash list' alfabéticamente por nombre&#10;- Ordena 'cash tickets' por ID del ticket&#10;- Ordena 'ticket list' agrupando por ID del cajero">
+      <option name="closed" value="true" />
+      <created>1767541632916</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1767541632916</updated>
+    </task>
+    <option name="localTasksCounter" value="10" />
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="fix: Update Catalog, Ticket, and CLI to support new Product hierarchy&#10;&#10;- Update Catalog to use String keys for product IDs instead of Integers.&#10;- Modify CategoryQuantityDiscountPolicy and Ticket to support ItemProduct checks, preventing errors with non-categorized products.&#10;- Refactor CommandLoop to parse String IDs and instantiate StandardProduct correctly.&#10;- Resolve all compilation errors resulting from the initial Product refactor." />
+    <MESSAGE value="feat: Implement EventProduct hierarchy with Food and Meeting types&#10;&#10;- Introduce EventProduct abstract class for products with expiration dates and capacity limits (max 100 people).&#10;- Implement Food class with a mandatory 3-day minimum planning time validation.&#10;- Implement Meeting class with a 12-hour minimum planning time validation.&#10;- Enforce temporal constraints to prevent creating events in the past or with insufficient notice." />
+    <MESSAGE value="feat: Add CLI support for Food and Meeting products&#10;&#10;- Update CommandLoop to handle 'addFood' and 'addMeeting' commands.&#10;- Implement automatic ID generation (UUID-based) when ID is omitted.&#10;- Add error handling for temporal constraints (3-day/12-hour rules) in the CLI.&#10;- Update help menu to reflect new commands." />
+    <MESSAGE value="feat: Implement User domain and Registry service&#10;&#10;- Create Client class with DNI as identifier and reference to creator Cashier.&#10;- Create Cashier class with automatic ID generation (UW prefix) and validation.&#10;- Implement UserRegistry service to manage unique collections of Clients and Cashiers." />
+    <MESSAGE value="feat: Implement User management and advanced Ticket logic&#10;&#10;- Add Client and Cashier domain classes with ID validation.&#10;- Implement UserRegistry service to manage actors.&#10;- Overhaul Ticket entity: introduce states (EMPTY, ACTIVE, CLOSED), owner tracking, and ID generation with timestamps.&#10;- Update TicketService to support repository pattern and owner security checks.&#10;- Update CLI to support new user commands and strict ticket syntax (requiring IDs)." />
+    <MESSAGE value="feat: Enable file input mode and refine CLI for full trace compliance&#10;&#10;- Update Main to accept an optional file path argument for batch execution.&#10;- Modify CommandLoop to support file reading and echo commands to standard output (required for auto-correction).&#10;- Improve 'ticket add' parser to handle concatenated flags (e.g., --pred) used in test traces.&#10;- Implement 'cash tickets' command to list tickets filtered by cashier.&#10;- Ensure full compatibility with the provided 'TrazaEjemplo.txt'." />
+    <MESSAGE value="refactor: Final Polish for Entrega 2 CLI output&#10;&#10;- Harmonize CommandLoop output format to match expected trace logs (header styles, state labels).&#10;- Adjust domain classes toString() methods to use requested labels (e.g., 'ProductPersonalized', 'identifier').&#10;- Ensure file-mode execution accurately mirrors interactive session output for auto-correction.&#10;- Fix logic to display correct real prices while maintaining strict adherence to PDF requirements." />
+    <MESSAGE value="feat: Finalize E2 implementation and align CLI output with trace&#10;&#10;- Update CategoryQuantityDiscountPolicy to calculate discounts based on the final unit price (including customizations), matching the provided trace logic.&#10;- Refactor CommandLoop to support file execution with command echoing.&#10;- Adjust toString() methods in Domain classes (Product, Client, Cashier) to match specific output formats (e.g., 'identifier', 'ProductPersonalized').&#10;- Harmonize CLI output headers and state labels (OPEN/CLOSE) with the expected trace.&#10;- Fix 'ticket add' parser to handle concatenated customization flags (e.g., --pred)." />
+    <MESSAGE value="fix(cli): corrige ordenacion en comandos list segun enunciado&#10;&#10;- Ordena 'client list' alfabéticamente por nombre&#10;- Ordena 'cash list' alfabéticamente por nombre&#10;- Ordena 'cash tickets' por ID del ticket&#10;- Ordena 'ticket list' agrupando por ID del cajero" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix(cli): corrige ordenacion en comandos list segun enunciado&#10;&#10;- Ordena 'client list' alfabéticamente por nombre&#10;- Ordena 'cash list' alfabéticamente por nombre&#10;- Ordena 'cash tickets' por ID del ticket&#10;- Ordena 'ticket list' agrupando por ID del cajero" />
+  </component>
+</project>
