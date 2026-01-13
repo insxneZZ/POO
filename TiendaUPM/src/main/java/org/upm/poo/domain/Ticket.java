@@ -101,11 +101,14 @@ public final class Ticket {
         if (state == TicketState.CLOSED) return;
 
         LocalDateTime now = LocalDateTime.now();
+
         for (LineItem li : items) {
             if (li.getProduct() instanceof EventProduct ep) {
                 ep.validatePlanningTime(now);
             }
         }
+
+        policy.validateClosing(this);
 
         this.state = TicketState.CLOSED;
         String closeSuffix = LocalDateTime.now().format(ID_FMT);

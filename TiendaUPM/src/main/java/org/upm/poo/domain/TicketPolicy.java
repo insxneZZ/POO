@@ -8,4 +8,8 @@ public interface TicketPolicy {
     double calculateTotalDiscount(Ticket t);
 
     String formatLineInfo(LineItem li);
+
+    void validateClosing(Ticket t);
+
+    void printTicketInfo(Ticket t);
 }
