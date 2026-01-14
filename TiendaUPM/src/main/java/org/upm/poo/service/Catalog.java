@@ -10,7 +10,19 @@ public final class Catalog {
     public Product add(Product p) {
         if (products.containsKey(p.getId()))
             throw new IllegalArgumentException("Product id already exists: " + p.getId());
+
         products.put(p.getId(), p);
+
+        if(p.getId().matches("\\d+S")){
+            try {
+                int idNum = Integer.parseInt(p.getId().replace("S", ""));
+                if(idNum > serviceCounter){
+                    serviceCounter = idNum;
+                }
+            } catch (NumberFormatException e) {
+                throw new IllegalArgumentException("Invalid product id: " + p.getId());
+            }
+        }
         return p;
     }
 
