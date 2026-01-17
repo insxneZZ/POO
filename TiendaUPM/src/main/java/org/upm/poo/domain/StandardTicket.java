@@ -2,8 +2,8 @@ package org.upm.poo.domain;
 
 public class StandardTicket extends Ticket {
 
-    public StandardTicket(String id, String cashierId, String clientId) {
-        super(id, cashierId, clientId);
+    public StandardTicket(String id, String cashierId, String clientId, PrintMode printMode) {
+        super(id, cashierId, clientId, printMode);
     }
 
     @Override

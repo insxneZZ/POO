@@ -163,9 +163,10 @@ public final class CommandLoop {
         if (a.size() < 2) return;
         switch (a.get(1)) {
             case "new" -> {
-                boolean isCombined = a.contains("-c");
-                boolean isProduct = a.contains("-p");
-                boolean isService = a.contains("-s");
+                PrintMode mode = PrintMode.DEFAULT;
+                if (a.contains("-c")) mode = PrintMode.COMBINED;
+                else if (a.contains("-s")) mode = PrintMode.SERVICE_ONLY;
+                else if (a.contains("-p")) mode = PrintMode.PRODUCT_ONLY;
 
                 List<String> args = new ArrayList<>(a);
                 args.removeIf(arg -> arg.startsWith("-") && arg.length() == 2);
@@ -180,7 +181,7 @@ public final class CommandLoop {
                     return;
                 }
 
-                Ticket t = tickets.createTicket(id, cashId, userId);
+                Ticket t = tickets.createTicket(id, cashId, userId, mode);
 
                 t.printDetails();
                 System.out.println("ticket new: ok");

@@ -101,7 +101,6 @@ public class PersistenceService {
 
             String type = typeElem.getAsString();
             try {
-                // Instancia la clase correcta (ServiceProduct, Food, etc.)
                 return context.deserialize(json, Class.forName("org.upm.poo.domain." + type));
             } catch (ClassNotFoundException e) {
                 throw new JsonParseException("Unknown product type: " + type, e);
@@ -119,11 +118,13 @@ public class PersistenceService {
 
             Client client = UserRegistry.getInstance().getClient(clientId);
 
+            PrintMode defaultMode = PrintMode.DEFAULT;
+
             Ticket ticket;
             if (client.isCompany()) {
-                ticket = new EnterpriseTicket(id, cashierId, clientId);
+                ticket = new EnterpriseTicket(id, cashierId, clientId, defaultMode);
             } else {
-                ticket = new StandardTicket(id, cashierId, clientId);
+                ticket = new StandardTicket(id, cashierId, clientId, defaultMode);
             }
 
             TicketState state = TicketState.EMPTY;

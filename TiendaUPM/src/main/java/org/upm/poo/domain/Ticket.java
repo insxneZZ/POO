@@ -10,16 +10,18 @@ public abstract class Ticket {
     protected final String clientId;
     protected TicketState state;
     protected final List<LineItem> items = new ArrayList<>();
+    protected PrintMode printMode;
 
     private static final DateTimeFormatter ID_FMT = DateTimeFormatter.ofPattern("yy-MM-dd-HH:mm");
 
-    public Ticket(String id, String cashierId, String clientId) {
+    public Ticket(String id, String cashierId, String clientId, PrintMode printMode) {
         if (cashierId == null || cashierId.isBlank()) throw new IllegalArgumentException("Cashier ID required");
         if (clientId == null || clientId.isBlank()) throw new IllegalArgumentException("Client ID required");
 
         this.cashierId = cashierId;
         this.clientId = clientId;
         this.state = TicketState.EMPTY;
+        this.printMode = (printMode == null) ? PrintMode.DEFAULT : printMode;
         this.id = (id == null || id.isBlank()) ? generateInitialId() : id;
     }
 
@@ -52,6 +54,7 @@ public abstract class Ticket {
     public String getClientId() { return clientId; }
     public TicketState getState() { return state; }
     public List<LineItem> getItems() { return Collections.unmodifiableList(items); }
+    public PrintMode getPrintMode() { return printMode; }
 
     public void add(Product p, int q, List<String> customizations) {
         if (state == TicketState.CLOSED) {

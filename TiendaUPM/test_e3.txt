@@ -1,0 +1,24 @@
+help
+
+# 1. Configuración inicial
+cash add UW1234567 "Cajero1" "cajero@upm.es"
+client add "Empresa A" B12345678 "empresa@mail.com" UW1234567
+prod addFood F1 "Comida Evento" 15.0 2026-12-31 50
+prod add 2025-12-31 TRANSPORT
+
+# 2. Prueba Ticket Empresa COMBINADO (-c)
+echo "--- TEST 1: Ticket Combinado (-c) ---"
+ticket new T-COMB UW1234567 B12345678 -c
+ticket add T-COMB UW1234567 F1 10
+ticket add T-COMB UW1234567 1S 1
+ticket print T-COMB UW1234567
+
+# 3. Prueba Ticket Empresa SOLO SERVICIOS (-s)
+echo "--- TEST 2: Ticket Servicios (-s) ---"
+ticket new T-SERV UW1234567 B12345678 -s
+ticket add T-SERV UW1234567 1S 5
+ticket print T-SERV UW1234567
+
+# 4. Prueba Persistencia
+echo "--- TEST 3: Persistencia (Salir y comprobar archivo) ---"
+exit

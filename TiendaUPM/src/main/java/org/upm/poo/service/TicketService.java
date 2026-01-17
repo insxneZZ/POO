@@ -17,7 +17,7 @@ public final class TicketService {
         return INSTANCE;
     }
 
-    public Ticket createTicket(String id, String cashierId, String clientId) {
+    public Ticket createTicket(String id, String cashierId, String clientId, PrintMode mode) {
         if (tickets.containsKey(id)) {
             throw new IllegalArgumentException("Ticket ID already exists: " + id);
         }
@@ -26,9 +26,9 @@ public final class TicketService {
         Ticket t;
 
         if (client.isCompany()) {
-            t = new EnterpriseTicket(id, cashierId, clientId);
+            t = new EnterpriseTicket(id, cashierId, clientId, mode);
         } else {
-            t = new StandardTicket(id, cashierId, clientId);
+            t = new StandardTicket(id, cashierId, clientId, mode);
         }
 
         tickets.put(t.getId(), t);
