@@ -8,14 +8,14 @@ import org.upm.poo.service.UserRegistry;
 
 public class Main {
     public static void main(String[] args) {
-        Catalog catalog = new Catalog();
-        UserRegistry userRegistry = new UserRegistry();
-        TicketService ticketService = new TicketService(userRegistry);
+        Catalog catalog = Catalog.getInstance();
+        UserRegistry userRegistry = UserRegistry.getInstance();
+        TicketService ticketService = TicketService.getInstance();
 
         PersistenceService persistence = new PersistenceService();
         persistence.load(catalog, userRegistry, ticketService);
 
-        CommandLoop app = new CommandLoop(catalog, ticketService, userRegistry);
+        CommandLoop app = new CommandLoop();
 
         String inputPath = (args.length > 0) ? args[0] : null;
         app.run(inputPath);

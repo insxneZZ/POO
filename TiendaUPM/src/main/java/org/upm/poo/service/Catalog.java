@@ -4,8 +4,16 @@ import org.upm.poo.domain.*;
 import java.util.*;
 
 public final class Catalog {
+    private static final Catalog INSTANCE = new Catalog();
+
     private final Map<String, Product> products = new LinkedHashMap<>();
     private int serviceCounter = 0;
+
+    private Catalog() {}
+
+    public static Catalog getInstance() {
+        return INSTANCE;
+    }
 
     public Product add(Product p) {
         if (products.containsKey(p.getId()))

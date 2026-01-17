@@ -15,14 +15,12 @@ import java.util.List;
 import java.util.UUID;
 
 public final class CommandLoop {
-    private final Catalog catalog;
-    private final TicketService tickets;
-    private final UserRegistry userRegistry;
+    private final Catalog catalog = Catalog.getInstance();
+    private final TicketService tickets = TicketService.getInstance();
+    private final UserRegistry userRegistry = UserRegistry.getInstance();
 
-    public CommandLoop(Catalog catalog, TicketService tickets, UserRegistry userRegistry) {
-        this.catalog = catalog;
-        this.tickets = tickets;
-        this.userRegistry = userRegistry;
+    public CommandLoop() {
+
     }
 
     public void run(String inputFilePath) {
@@ -78,12 +76,7 @@ public final class CommandLoop {
     }
 
     private void printHelp() {
-        System.out.println("Commands:");
-        System.out.println("  prod add ... / addFood ... / addMeeting ... / list / update / remove");
-        System.out.println("  client add ... / remove / list");
-        System.out.println("  cash add ... / remove / list / tickets");
-        System.out.println("  ticket new / add / remove / print / list");
-        System.out.println("  help / exit / echo");
+        System.out.println("Commands: prod ..., client ..., cash ..., ticket ...");
     }
 
     // --- PRODUCTOS ---
@@ -95,46 +88,29 @@ public final class CommandLoop {
                     LocalDate exp = LocalDate.parse(a.get(2));
                     Category cat = Category.valueOf(a.get(3));
                     String id = catalog.generateServiceId();
-
                     ServiceProduct sp = new ServiceProduct(id, exp, cat);
                     catalog.add(sp);
                     System.out.println(sp);
                     System.out.println("prod add: ok");
                     return;
                 }
-
-                String id, name;
-                Category cat;
-                double price;
-                Integer maxPers = null;
-
+                String id, name; Category cat; double price; Integer maxPers = null;
                 int catIdx = -1;
                 if (a.size() > 3 && isCategory(a.get(3))) catIdx = 3;
                 else if (a.size() > 4 && isCategory(a.get(4))) catIdx = 4;
 
                 if (catIdx == -1) { System.out.println("Usage error: check category"); return; }
 
-                if (catIdx == 4) {
-                    id = a.get(2); name = a.get(3);
-                } else {
-                    id = "P-" + UUID.randomUUID().toString().substring(0, 5);
-                    name = a.get(2);
-                }
+                if (catIdx == 4) { id = a.get(2); name = a.get(3); }
+                else { id = "P-" + UUID.randomUUID().toString().substring(0, 5); name = a.get(2); }
 
                 cat = Category.valueOf(a.get(catIdx));
-
-                if (a.size() <= catIdx + 1) {
-                    System.out.println("Usage error: missing price");
-                    return;
-                }
-
                 price = Double.parseDouble(a.get(catIdx + 1));
                 if (a.size() > catIdx + 2) maxPers = Integer.parseInt(a.get(catIdx + 2));
 
                 Product p = (maxPers != null) ?
                         new CustomizableProduct(id, name, cat, price, maxPers) :
                         new StandardProduct(id, name, cat, price);
-
                 catalog.add(p);
                 System.out.println(p);
                 System.out.println("prod add: ok");
@@ -142,13 +118,9 @@ public final class CommandLoop {
             case "addFood", "addMeeting" -> {
                 boolean isFood = a.get(1).equals("addFood");
                 String id, name; double price; LocalDate exp; int maxP;
-
                 int offset = 0;
-                if (a.size() == 7) {
-                    id = a.get(2); offset = 1;
-                } else {
-                    id = (isFood ? "F-" : "M-") + UUID.randomUUID().toString().substring(0, 5);
-                }
+                if (a.size() == 7) { id = a.get(2); offset = 1; }
+                else { id = (isFood ? "F-" : "M-") + UUID.randomUUID().toString().substring(0, 5); }
 
                 name = a.get(2 + offset);
                 price = Double.parseDouble(a.get(3 + offset));
@@ -191,6 +163,10 @@ public final class CommandLoop {
         if (a.size() < 2) return;
         switch (a.get(1)) {
             case "new" -> {
+                boolean isCombined = a.contains("-c");
+                boolean isProduct = a.contains("-p");
+                boolean isService = a.contains("-s");
+
                 List<String> args = new ArrayList<>(a);
                 args.removeIf(arg -> arg.startsWith("-") && arg.length() == 2);
 
@@ -205,7 +181,8 @@ public final class CommandLoop {
                 }
 
                 Ticket t = tickets.createTicket(id, cashId, userId);
-                printTicketState(t);
+
+                t.printDetails();
                 System.out.println("ticket new: ok");
             }
             case "add" -> {
@@ -215,15 +192,9 @@ public final class CommandLoop {
 
                 int qty = 1;
                 int nextArgIdx = 5;
-
                 if (a.size() > 5) {
-                    try {
-                        qty = Integer.parseInt(a.get(5));
-                        nextArgIdx = 6;
-                    } catch (NumberFormatException e) {
-                        qty = 1;
-                        nextArgIdx = 5;
-                    }
+                    try { qty = Integer.parseInt(a.get(5)); nextArgIdx = 6; }
+                    catch (NumberFormatException e) { qty = 1; nextArgIdx = 5; }
                 }
 
                 List<String> customs = new ArrayList<>();
@@ -240,9 +211,7 @@ public final class CommandLoop {
                 Product p = catalog.get(pId);
 
                 t.add(p, qty, customs);
-
-                printTicketDetails(t);
-
+                t.printDetails();
                 System.out.println("ticket add: ok");
             }
             case "remove" -> {
@@ -255,7 +224,7 @@ public final class CommandLoop {
                 Ticket t = tickets.getTicket(a.get(2));
                 tickets.verifyOwner(t, a.get(3));
                 t.close();
-                printTicketDetails(t);
+                t.printDetails();
                 System.out.println("ticket print: ok");
             }
             case "list" -> {
@@ -273,26 +242,6 @@ public final class CommandLoop {
                 System.out.println("ticket list: ok");
             }
         }
-    }
-
-    private void printTicketState(Ticket t) {
-        printTicketHeader(t);
-        printTicketTotals(t);
-    }
-
-    private void printTicketHeader(Ticket t) {
-        System.out.println("Ticket : " + t.getId());
-    }
-
-    private void printTicketTotals(Ticket t) {
-        System.out.println("  Total price: " + trim(t.totalPrice()));
-        System.out.println("  Total discount: " + trim(t.totalDiscount()));
-        System.out.println("  Final Price: " + trim(t.finalPrice()));
-    }
-
-    private void printTicketDetails(Ticket t) {
-        printTicketHeader(t);
-        t.getPolicy().printTicketInfo(t);
     }
 
     // --- USUARIOS ---
@@ -327,9 +276,7 @@ public final class CommandLoop {
             case "remove" -> {
                 String cId = a.get(2);
                 tickets.removeTicketsByCashier(cId);
-
                 userRegistry.removeCashier(cId);
-
                 System.out.println("cash remove: ok");
             }
             case "list" -> {

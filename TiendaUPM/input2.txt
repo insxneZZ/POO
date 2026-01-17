@@ -1,0 +1,30 @@
+echo "--- INICIO DEL TEST AUTOMATICO ---"
+echo "1. Creando Usuarios (Cajero, Cliente Normal, Empresa)..."
+cash add UW0000001 CajeroTest cajero@test.com
+client add ClienteNormal 11111111A normal@email.com UW0000001
+client add ClienteEmpresa B99999999 empresa@corp.com UW0000001
+
+echo "2. Creando Catalogo (Productos y Servicios)..."
+prod add P1 LibroJava BOOK 50.0
+prod add P2 PortatilGaming ELECTRONICS 1000.0
+prod add 2030-12-31 TRANSPORT
+
+echo "3. TEST TICKET ESTANDAR (Debe fallar al añadir servicio)..."
+ticket new T-STD UW0000001 11111111A
+ticket add T-STD UW0000001 P1
+echo "   -> Intentando añadir servicio 1S a ticket estandar (Debe dar Error):"
+ticket add T-STD UW0000001 1S
+echo "   -> Impresion Ticket Estandar (Solo debe salir el libro):"
+ticket print T-STD UW0000001
+
+echo "4. TEST TICKET EMPRESA (Debe aceptar todo y aplicar descuento)..."
+ticket new T-CORP UW0000001 B99999999
+ticket add T-CORP UW0000001 P2
+echo "   -> Añadiendo servicio (Debe activar descuento 15%):"
+ticket add T-CORP UW0000001 1S
+echo "   -> Impresion Ticket Empresa (Servicio sin precio + Descuento):"
+ticket print T-CORP UW0000001
+
+echo "5. Listado final y Guardado (Persistencia)..."
+ticket list
+exit

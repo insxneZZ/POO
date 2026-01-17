@@ -5,12 +5,16 @@ import org.upm.poo.domain.user.Client;
 import java.util.*;
 
 public final class TicketService {
+    private static final TicketService INSTANCE = new TicketService();
+
     private final Map<String, Ticket> tickets = new LinkedHashMap<>();
 
-    private final UserRegistry userRegistry;
+    private final UserRegistry userRegistry = UserRegistry.getInstance();
 
-    public TicketService(UserRegistry userRegistry) {
-        this.userRegistry = userRegistry;
+    private TicketService() {}
+
+    public static TicketService getInstance() {
+        return INSTANCE;
     }
 
     public Ticket createTicket(String id, String cashierId, String clientId) {
@@ -19,13 +23,12 @@ public final class TicketService {
         }
 
         Client client = userRegistry.getClient(clientId);
-
-        Ticket t = new Ticket(id, cashierId, clientId);
+        Ticket t;
 
         if (client.isCompany()) {
-            t.setPolicy(new EnterpriseTicketPolicy());
+            t = new EnterpriseTicket(id, cashierId, clientId);
         } else {
-            t.setPolicy(new StandardTicketPolicy());
+            t = new StandardTicket(id, cashierId, clientId);
         }
 
         tickets.put(t.getId(), t);
@@ -34,6 +37,14 @@ public final class TicketService {
 
     public Ticket getTicket(String id) {
         Ticket t = tickets.get(id);
+
+        if (t == null) {
+            t = tickets.values().stream()
+                    .filter(ticket -> ticket.getId().startsWith(id + "-"))
+                    .findFirst()
+                    .orElse(null);
+        }
+
         if (t == null) throw new NoSuchElementException("Ticket not found: " + id);
         return t;
     }

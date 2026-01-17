@@ -1,0 +1,15 @@
+echo "--- VERIFICACION DE PERSISTENCIA (TRAS REINICIO) ---"
+echo "1. Listando Catalogo (Deben estar los servicios 1S y 2S)..."
+prod list
+echo "2. Listando Clientes y Cajeros..."
+client list
+cash list
+echo "3. Listando Tickets (Deben aparecer tickets cerrados de la sesion anterior)..."
+ticket list
+echo "4. AUDITORIA: Imprimiendo ticket de EMPRESA (212130) cargado desde disco..."
+echo "   Debe mostrar: Services Included (sin precio) y descuento aplicado."
+ticket print 212130 UW1234567
+echo "5. AUDITORIA: Imprimiendo ticket ESTANDAR (212123) cargado desde disco..."
+echo "   Debe mostrar precios normales y descuentos por categoria."
+ticket print 212123 UW1234567
+exit
